@@ -25,17 +25,16 @@ import {
     Button,
     Card,
     Modal,
-    useDisclosure,
+
 } from "@heroui/react";
 
 
 
 const MngOpportunity = () => {
-    const { data: session } = useSession();
+    const { data: session, isPending } = useSession();
 
     const [startup, setStartup] = useState(null);
-    const [isOpen, setIsOpen] = useState(false);
-
+    const [loading, setLoading] = useState(true);
     const [selectedId, setSelectedId] = useState(null);
     const [deleting, setDeleting] = useState(false);
     const [opportunities, setOpportunities] = useState([]);
@@ -43,19 +42,8 @@ const MngOpportunity = () => {
     const loadData = useCallback(async () => {
         if (!session?.user?.email) return;
 
-        const startupData = await myStartup(session.user.email);
-
-        setStartup(startupData);
-
-        if (startupData?._id) {
-            const result = await getMyOpportunities(startupData._id);
-            setOpportunities(result || []);
-        }
-    }, [session]);
-
-    useEffect(() => {
-        const loadData = async () => {
-            if (!session?.user?.email) return;
+        try {
+            setLoading(true);
 
             const startupData = await myStartup(session.user.email);
 
@@ -64,29 +52,84 @@ const MngOpportunity = () => {
             if (startupData?._id) {
                 const result = await getMyOpportunities(startupData._id);
                 setOpportunities(result || []);
+            } else {
+                setOpportunities([]);
             }
-        };
-
-        loadData();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
     }, [session]);
+
+    useEffect(() => {
+
+        const fetchData = async () => {
+            if (!session?.user?.email) {
+                setLoading(false); return;
+            }
+            try {
+                setLoading(true);
+                const startupData = await myStartup(session.user.email);
+                setStartup(startupData);
+                if (startupData?._id) {
+                    const result = await getMyOpportunities(startupData._id);
+                    setOpportunities(result || []);
+                }
+            } catch (err) {
+                console.error(err);
+
+            } finally { setLoading(false); }
+        }; fetchData();
+    }, [session?.user?.email]);
 
     const handleDelete = async () => {
         if (!selectedId) return;
 
-        setDeleting(true);
+        try {
+            setDeleting(true);
 
-        const result = await deleteOpportunity(selectedId);
+            const result = await deleteOpportunity(selectedId);
 
-        if (result.deletedCount) {
-            toast.success("Opportunity Deleted");
-
-            await loadData();
-        } else {
-            toast.error("Delete Failed");
+            if (result.deletedCount) {
+                toast.success("Opportunity Deleted");
+                await loadData();
+            } else {
+                toast.error("Delete Failed");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Something went wrong");
+        } finally {
+            setDeleting(false);
         }
-
-        setDeleting(false);
     };
+    console.log({
+        loading,
+        session,
+        opportunities,
+    });
+
+    if (isPending || loading) {
+        return (
+            <div className="w-11/12 mx-auto">
+                <DashboardTitle
+                    title="Manage Opportunities"
+                    description="Update or remove your startup opportunities."
+                />
+
+                <div className="mt-8 grid gap-6">
+                    {[1, 2, 3].map((i) => (
+                        <Card
+                            key={i}
+                            className="h-52 animate-pulse rounded-3xl bg-slate-800/60"
+                        />
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="w-11/12 mx-auto">
             <DashboardTitle
