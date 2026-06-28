@@ -21,7 +21,7 @@ export default function FilterPanel() {
     const [work, setWork] = useState("");
     const [industry, setIndustry] = useState("")
 
-    console.log(role, skill, work, industry);
+    // console.log(role, skill, work, industry);
 
 
     const handleReset = () => {
