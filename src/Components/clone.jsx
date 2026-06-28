@@ -1304,3 +1304,14 @@
 
 //             res.send(result);
 //         });
+
+
+
+// Create opportunity
+// app.post("/api/opportunities", async (req, res) => {
+//     const data = req.body;
+
+//     const result = await opportunitiesCollection.insertOne(data);
+
+//     res.send(result);
+// });

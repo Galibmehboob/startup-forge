@@ -51,6 +51,7 @@ export default function AddStartupForm() {
             funding_stage: "",
             image: "",
             description: "",
+
         },
     });
 

@@ -2,7 +2,6 @@ import { baseUrl } from "@/lib/api/basrUrl";
 import {
     Button,
     Card,
-
     Chip,
 } from "@heroui/react";
 
@@ -11,6 +10,8 @@ import {
     CalendarDays,
     Clock3,
     Laptop,
+    ArrowLeft,
+    Sparkles,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,148 +25,128 @@ const fetchOpportunity = async (_id) => {
         throw new Error("Failed to fetch opportunity");
     }
 
-
-
     const data = await res.json();
-
-
-    console.log(Array.isArray(data));
-    console.log(data);
-
     return data;
-
-
 };
 
 const CardDetailsPage = async ({ params }) => {
     const { id } = await params;
-
     const opportunity = await fetchOpportunity(id);
 
-    console.log("params id:", id);
-    console.log("API Response:", opportunity);
-    console.log("role:", opportunity?.role_title);
-
     return (
-        <section className="max-w-5xl mx-auto px-4 py-10">
-            <Card
-                radius="lg"
-                className="border border-white/10 bg-slate-900/60 backdrop-blur-xl"
-            >
-                <Card className="space-y-8 p-8">
+        <section className="min-h-screen bg-slate-950 bg-gradient-to-b from-slate-955 via-slate-900 to-[#0c1938] text-white overflow-x-hidden selection:bg-blue-500/30 py-16 relative">
 
-                    <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+            {/* Ambient Background Glow Effect */}
+            <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[140px] pointer-events-none" />
 
-                        {/* Left */}
-                        <div className="text-center lg:text-left">
+            <div className="max-w-4xl mx-auto px-4 relative z-10">
+                <Card
+                    radius="2xl"
+                    className="border border-white/10 bg-slate-900/40 backdrop-blur-xl p-6 sm:p-10 shadow-[0_24px_60px_rgba(0,0,0,0.4)] text-white"
+                >
+                    {/* Header Zone: Chips and Title Blocks */}
+                    <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between border-b border-white/5 pb-8">
 
+                        {/* Left Info Column */}
+                        <div className="flex-1 space-y-3 text-left">
                             <Chip
-                                color="primary"
                                 variant="flat"
-                                className="mb-4"
+                                className="bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium text-xs rounded-lg"
                             >
-                                Opportunity Details
+                                <span className="flex items-center gap-1">
+                                    <Sparkles size={12} /> Opportunity Specification
+                                </span>
                             </Chip>
 
-                            <h1 className="text-3xl font-bold text-white sm:text-4xl">
-                                {opportunity.role_title}
+                            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent leading-tight">
+                                {opportunity?.role_title}
                             </h1>
-
                         </div>
 
-                        {/* Right */}
-                        <div className="flex items-center gap-4">
-
-                            <Image
-                                src={opportunity.logo}
-                                alt={opportunity.startup_name}
-                                width={60}
-                                height={60}
-                                className="h-14 w-14 rounded-full border-2 border-white bg-white object-cover"
-                            />
+                        {/* Right Brand Logo Column */}
+                        <div className="flex items-center gap-4 bg-slate-950/40 border border-white/5 rounded-2xl p-4 shrink-0 backdrop-blur-md">
+                            {opportunity?.logo && (
+                                <Image
+                                    src={opportunity.logo}
+                                    alt={opportunity.startup_name || "Startup"}
+                                    width={56}
+                                    height={56}
+                                    className="h-14 w-14 rounded-xl border border-white/10 bg-slate-950 object-cover shrink-0"
+                                />
+                            )}
 
                             <div>
-
                                 <Chip
-                                    color="primary"
                                     variant="flat"
                                     size="sm"
-                                    className="mb-2"
+                                    className="mb-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 font-medium text-[10px]"
                                 >
-                                    {opportunity.industry}
+                                    {opportunity?.industry}
                                 </Chip>
-
-                                <h2 className="text-xl font-bold text-white">
-                                    {opportunity.startup_name}
+                                <h2 className="text-lg font-bold text-slate-200">
+                                    {opportunity?.startup_name}
                                 </h2>
-
                             </div>
-
                         </div>
 
                     </div>
 
-                    <div className="grid gap-5 md:grid-cols-2">
+                    {/* Operational Core Parameters Info Grid */}
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-8">
 
-                        <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-slate-800/40 p-4">
-                            <Laptop className="text-blue-400" />
-
+                        <div className="flex items-center gap-4 rounded-xl border border-white/5 bg-slate-950/30 p-4 transition-all duration-200 hover:border-white/10">
+                            <div className="p-2.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0">
+                                <Laptop size={18} />
+                            </div>
                             <div>
-                                <p className="text-sm text-slate-400">
-                                    Work Type
-                                </p>
-
-                                <h3 className="font-semibold text-white">
-                                    {opportunity.work_type}
+                                <p className="text-xs text-slate-500 uppercase tracking-wider font-medium">Work Type</p>
+                                <h3 className="font-semibold text-slate-200 mt-0.5 text-sm sm:text-base">
+                                    {opportunity?.work_type}
                                 </h3>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-slate-800/40 p-4">
-                            <Clock3 className="text-emerald-400" />
-
+                        <div className="flex items-center gap-4 rounded-xl border border-white/5 bg-slate-950/30 p-4 transition-all duration-200 hover:border-white/10">
+                            <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+                                <Clock3 size={18} />
+                            </div>
                             <div>
-                                <p className="text-sm text-slate-400">
-                                    Commitment Level
-                                </p>
-
-                                <h3 className="font-semibold text-white">
-                                    {opportunity.commitment_level}
+                                <p className="text-xs text-slate-500 uppercase tracking-wider font-medium">Commitment</p>
+                                <h3 className="font-semibold text-slate-200 mt-0.5 text-sm sm:text-base">
+                                    {opportunity?.commitment_level}
                                 </h3>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-slate-800/40 p-4 md:col-span-2">
-                            <CalendarDays className="text-orange-400" />
-
+                        <div className="flex items-center gap-4 rounded-xl border border-white/5 bg-slate-950/30 p-4 sm:col-span-2 lg:col-span-1 transition-all duration-200 hover:border-white/10">
+                            <div className="p-2.5 rounded-lg bg-orange-500/10 text-orange-400 border border-orange-500/20 shrink-0">
+                                <CalendarDays size={18} />
+                            </div>
                             <div>
-                                <p className="text-sm text-slate-400">
-                                    Deadline
-                                </p>
-
-                                <h3 className="font-semibold text-white">
-                                    {opportunity.deadline}
+                                <p className="text-xs text-slate-500 uppercase tracking-wider font-medium">Application Deadline</p>
+                                <h3 className="font-semibold text-slate-200 mt-0.5 text-sm sm:text-base">
+                                    {opportunity?.deadline}
                                 </h3>
                             </div>
                         </div>
 
                     </div>
 
-                    <div>
+                    {/* Skill Tags Boundary Matrix */}
+                    <div className="mt-8 border-t border-white/5 pt-8">
                         <div className="mb-4 flex items-center gap-2">
-                            <Briefcase className="text-blue-400" />
-
-                            <h2 className="text-xl font-semibold text-white">
-                                Required Skills
+                            <Briefcase size={16} className="text-blue-400" />
+                            <h2 className="text-base font-bold uppercase tracking-wider text-slate-300">
+                                Required Skill Set
                             </h2>
                         </div>
 
-                        <div className="flex flex-wrap gap-3">
-                            {opportunity.required_skills?.map((skill) => (
+                        <div className="flex flex-wrap gap-2.5">
+                            {opportunity?.required_skills?.map((skill) => (
                                 <Chip
                                     key={skill}
-                                    color="primary"
                                     variant="flat"
+                                    className="bg-slate-800/60 text-slate-300 border border-white/5 rounded-lg font-medium text-xs px-3 py-1"
                                 >
                                     {skill}
                                 </Chip>
@@ -173,31 +154,28 @@ const CardDetailsPage = async ({ params }) => {
                         </div>
                     </div>
 
-                    <div className="flex gap-3">
-
-                        <Link href={`/opportunities`}>
+                    {/* Form Controls / Redirections Block */}
+                    <div className="flex flex-col sm:flex-row gap-4 mt-10 pt-6 border-t border-white/5">
+                        <Link href={`/opportunities`} className="w-full sm:w-1/3">
                             <Button
-                                variant="outline"
-                                radius="lg" className="h-14 w-full text-base font-semibold"
-
+                                variant="bordered"
+                                radius="xl"
+                                className="h-12 w-full text-slate-300 border-white/10 bg-slate-800/20 hover:bg-slate-800 font-semibold text-sm transition-all duration-200 gap-2"
                             >
-                                Back
+                                <ArrowLeft size={16} /> Back
                             </Button>
                         </Link>
+
                         <Button
-                            radius="lg"
-                            className="group relative h-14 w-full overflow-hidden p-0"
+                            radius="xl"
+                            className="group flex-1 h-12 w-full bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white font-bold text-sm shadow-xl hover:opacity-95 transition-all duration-200 active:scale-[0.99]"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#081C3A] via-[#0B2447] to-[#123C69] transition-opacity duration-500 ease-in-out group-hover:opacity-0" />
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#123C69] via-[#0B2447] to-[#081C3A] opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100" />
-                            <span className="relative z-10 flex h-full w-full items-center justify-center text-base font-semibold text-white">
-                                Apply Now
-                            </span>
+                            Apply Now
                         </Button>
                     </div>
 
                 </Card>
-            </Card>
+            </div>
         </section>
     );
 };
