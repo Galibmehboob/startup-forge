@@ -80,7 +80,7 @@ const AddOpportunityForm = () => {
             reset();
             router.push("/opportunities");
         } else {
-            toast.error("Something went wrong");
+            toast.error(result.massage || "You've Reached The Free Plan's");
         }
     };
 
