@@ -1,10 +1,56 @@
 import FilterPanel from "@/Components/FilterPanel";
 import OpportunityCard from "@/Components/OpportunityCard";
+import CustomPagination from "@/Components/Pagination";
 import { fetchOpportunities } from "@/lib/api/opportunities/data";
 import { Layers, Sparkles } from "lucide-react";
+const OpportunitiesPage = async ({ searchParams }) => {
 
-const OpportunitiesPage = async () => {
-    const opportunities = await fetchOpportunities();
+    const sParams = await searchParams;
+
+    const role = sParams.role || "";
+    const skill = sParams.skill || "";
+    const work = sParams.work || "";
+    const level = sParams.level || "";
+
+    const page = sParams.page || 1;
+
+
+    const params = new URLSearchParams();
+
+
+    if (role) {
+        params.set("role", role);
+    }
+
+    if (skill) {
+        params.set("skill", skill);
+    }
+
+    if (work) {
+        params.set("work", work);
+    }
+
+    if (level) {
+        params.set("level", level);
+    }
+
+
+    // pagination
+    params.set("page", page);
+    params.set("limit", 6);
+
+
+
+    const result = await fetchOpportunities(params);
+
+
+    const opportunities = result.opportunities;
+
+
+
+
+
+
 
     return (
         <section className="min-h-screen bg-slate-950 bg-gradient-to-b from-slate-950 via-slate-900 to-[#0c1938] text-white overflow-x-hidden selection:bg-blue-500/30 py-12 relative">
@@ -45,6 +91,7 @@ const OpportunitiesPage = async () => {
                             >
                                 <OpportunityCard opportunity={opportunity} />
                             </div>
+
                         ))
                     ) : (
                         <div className="col-span-full rounded-2xl border border-dashed border-white/10 bg-slate-900/10 backdrop-blur-sm py-20 text-center max-w-xl mx-auto px-6 transform transition-all">
@@ -59,6 +106,9 @@ const OpportunitiesPage = async () => {
                             </p>
                         </div>
                     )}
+                    <CustomPagination
+                        totalPages={result.totalPages}
+                    />
                 </div>
 
             </div>

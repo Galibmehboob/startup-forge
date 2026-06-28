@@ -10,8 +10,8 @@ export const getOpportunity = async (id) => {
 
 };
 
-export const fetchOpportunities = async () => {
-    const result = await serverFetch(`/api/opportunities`);
+export const fetchOpportunities = async (query) => {
+    const result = await serverFetch(`/api/opportunities?${query.toString()}`);
 
     return result;
 };
