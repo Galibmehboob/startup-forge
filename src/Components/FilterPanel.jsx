@@ -2,6 +2,7 @@
 
 import { Button, Label, ListBox, SearchField, Select } from "@heroui/react";
 import { RotateCcw, Search, SlidersHorizontal } from "lucide-react";
+import { useState } from "react";
 
 const WORK_TYPES = ["Remote", "Hybrid", "On-site"];
 
@@ -14,6 +15,15 @@ const INDUSTRIES = [
 ];
 
 export default function FilterPanel() {
+
+    const [role, setRole] = useState("");
+    const [skill, setSkill] = useState("");
+    const [work, setWork] = useState("");
+    const [industry, setIndustry] = useState("")
+
+    console.log(role, skill, work, industry);
+
+
     const handleReset = () => {
         console.log("Reset Filters");
     };
@@ -35,6 +45,8 @@ export default function FilterPanel() {
                     <SearchField.Group className="relative flex items-center bg-slate-950/50 border border-white/10 rounded-xl h-12 px-3 focus-within:border-blue-500/50 transition-all duration-200">
                         <SearchField.SearchIcon className="text-slate-500 mr-2 shrink-0" size={16} />
                         <SearchField.Input
+                            value={role}
+                            onChange={e => setRole(e.target.value)}
                             placeholder="Search role..."
                             className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus:outline-none"
                         />
@@ -48,6 +60,8 @@ export default function FilterPanel() {
                     <SearchField.Group className="relative flex items-center bg-slate-950/50 border border-white/10 rounded-xl h-12 px-3 focus-within:border-blue-500/50 transition-all duration-200">
                         <SearchField.SearchIcon className="text-slate-500 mr-2 shrink-0" size={16} />
                         <SearchField.Input
+                            value={skill}
+                            onChange={e => setSkill(e.target.value)}
                             placeholder="Search skill..."
                             className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus:outline-none"
                         />
@@ -56,56 +70,54 @@ export default function FilterPanel() {
                 </SearchField>
 
                 {/* Work Type */}
-                <Select className="w-full flex flex-col gap-1.5 text-white" placeholder="Select work type">
-                    <Label className="text-xs md:text-sm font-medium text-slate-300">Work Type</Label>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-300">
+                        Work Type
+                    </label>
 
-                    <Select.Trigger className="flex items-center justify-between w-full bg-slate-950/50 border border-white/10 rounded-xl h-12 px-4 text-sm text-slate-300 focus:border-blue-500/50 transition-all duration-200">
-                        <Select.Value className="placeholder:text-slate-500" />
-                        <Select.Indicator className="text-slate-500" />
-                    </Select.Trigger>
+                    <select
+                        value={work}
+                        onChange={(e) => setWork(e.target.value)}
+                        className="w-full h-12 rounded-xl border border-slate-700 bg-slate-900 px-4 text-white outline-none transition-all duration-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    >
+                        <option value="">All Work Types</option>
 
-                    <Select.Popover className="bg-slate-900 border border-white/10 rounded-xl p-1 shadow-2xl mt-1 text-white">
-                        <ListBox className="flex flex-col gap-1">
-                            {WORK_TYPES.map((item) => (
-                                <ListBox.Item
-                                    key={item}
-                                    id={item}
-                                    textValue={item}
-                                    className="px-3 py-2 text-sm text-slate-300 hover:bg-blue-600 hover:text-white rounded-lg cursor-pointer transition-colors duration-150 flex items-center justify-between"
-                                >
-                                    {item}
-                                    <ListBox.ItemIndicator />
-                                </ListBox.Item>
-                            ))}
-                        </ListBox>
-                    </Select.Popover>
-                </Select>
+                        {WORK_TYPES.map((item) => (
+                            <option
+                                key={item}
+                                value={item}
+                                className="bg-slate-900 text-white"
+                            >
+                                {item}
+                            </option>
+                        ))}
+                    </select>
+                </div>
 
                 {/* Industry */}
-                <Select className="w-full flex flex-col gap-1.5 text-white" placeholder="Select industry">
-                    <Label className="text-xs md:text-sm font-medium text-slate-300">Industry</Label>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-300">
+                        Industry
+                    </label>
 
-                    <Select.Trigger className="flex items-center justify-between w-full bg-slate-950/50 border border-white/10 rounded-xl h-12 px-4 text-sm text-slate-300 focus:border-blue-500/50 transition-all duration-200">
-                        <Select.Value className="placeholder:text-slate-500" />
-                        <Select.Indicator className="text-slate-500" />
-                    </Select.Trigger>
+                    <select
+                        value={industry}
+                        onChange={(e) => setIndustry(e.target.value)}
+                        className="w-full h-12 rounded-xl border border-slate-700 bg-slate-900 px-4 text-white outline-none transition-all duration-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    >
+                        <option value="">All Industries</option>
 
-                    <Select.Popover className="bg-slate-900 border border-white/10 rounded-xl p-1 shadow-2xl mt-1 text-white">
-                        <ListBox className="flex flex-col gap-1">
-                            {INDUSTRIES.map((item) => (
-                                <ListBox.Item
-                                    key={item}
-                                    id={item}
-                                    textValue={item}
-                                    className="px-3 py-2 text-sm text-slate-300 hover:bg-blue-600 hover:text-white rounded-lg cursor-pointer transition-colors duration-150 flex items-center justify-between"
-                                >
-                                    {item}
-                                    <ListBox.ItemIndicator />
-                                </ListBox.Item>
-                            ))}
-                        </ListBox>
-                    </Select.Popover>
-                </Select>
+                        {INDUSTRIES.map((item) => (
+                            <option
+                                key={item}
+                                value={item}
+                                className="bg-slate-900 text-white"
+                            >
+                                {item}
+                            </option>
+                        ))}
+                    </select>
+                </div>
 
                 {/* Search Button */}
                 <div className="w-full">
