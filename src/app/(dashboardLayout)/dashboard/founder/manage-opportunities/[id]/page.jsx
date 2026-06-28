@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { parseDate } from "@internationalized/date";
 
 import DashboardTitle from "@/Components/DashboardTitle";
 
@@ -54,7 +55,7 @@ const UpdateOpportunity = () => {
                 required_skills: result?.required_skills || [],
                 work_type: result?.work_type || "",
                 commitment_level: result?.commitment_level || "",
-                deadline: result?.deadline || null,
+                deadline: result?.deadline ? parseDate(result.deadline) : null,
             });
         };
 
@@ -72,7 +73,7 @@ const UpdateOpportunity = () => {
             required_skills: data.required_skills,
             work_type: data.work_type,
             commitment_level: data.commitment_level,
-            deadline: formattedDeadline,
+            deadline: data.deadline?.toString(),
         };
 
         const result = await updateOpportunities(updateData, params.id);
@@ -137,7 +138,7 @@ const UpdateOpportunity = () => {
                         onSubmit={handleSubmit(onSubmit)}
                         className="grid grid-cols-1 gap-6 md:grid-cols-2"
                     >
-                        {/* ================= Role Title ================= */}
+                        {/*  Role Title  */}
                         <div className="space-y-2">
                             <Controller
                                 name="role_title"
@@ -348,6 +349,7 @@ const UpdateOpportunity = () => {
                             <Button
                                 type="submit"
                                 radius="lg"
+
                                 className="h-14 w-full bg-gradient-to-r from-[#081C3A] via-[#0B2447] to-[#123C69] text-base font-semibold text-white shadow-xl hover:opacity-90"
                             >
                                 Update Opportunity

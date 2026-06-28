@@ -127,6 +127,22 @@ export default function SignupPage() {
         toast.success("Account created successfully!");
         router.push("/");
     };
+
+
+    const handleGoogleLogin = async () => {
+        try {
+            await authClient.signIn.social({
+                provider: "google",
+                callbackURL: "/",
+            });
+        } catch (err) {
+            console.error(err);
+            toast.error("Google login failed");
+        }
+    };
+
+
+
     return (
         <div className="min-h-screen bg-black">
             <div className="grid min-h-screen lg:grid-cols-2">
@@ -467,6 +483,7 @@ export default function SignupPage() {
                             </div>
 
                             <Button
+                                onPress={handleGoogleLogin}
                                 variant="bordered"
                                 className="h-12 w-full border-white/10 text-white"
                             >

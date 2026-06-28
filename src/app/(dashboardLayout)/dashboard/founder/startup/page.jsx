@@ -2,55 +2,28 @@
 
 import { useEffect, useRef, useState } from "react";
 import DashboardTitle from "@/Components/DashboardTitle";
-import { Button, Form, Label } from "@heroui/react";
+import { Button, Form, Label, Select, ListBox } from "@heroui/react";
 import toast from "react-hot-toast";
 import { useSession } from "@/lib/auth-client";
 import { myStartup } from "@/lib/api/startups/data";
 import Image from "next/image";
 import { FaImage } from "react-icons/fa";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { handleImageUpload } from "@/utils/uploadeImg";
 import { updateStartups } from "@/lib/api/startups/action";
 
-
 const FUNDING_STAGES = [
-    {
-        value: "pre-seed",
-        label: "Pre-Seed",
-    },
-    {
-        value: "seed",
-        label: "Seed",
-    },
-    {
-        value: "series-a",
-        label: "Series A",
-    },
-    {
-        value: "series-b",
-        label: "Series B",
-    },
-    {
-        value: "series-c",
-        label: "Series C+",
-    },
-    {
-        value: "bootstrapped",
-        label: "Bootstrapped",
-    },
+    { value: "pre-seed", label: "Pre-Seed" },
+    { value: "seed", label: "Seed" },
+    { value: "series-a", label: "Series A" },
+    { value: "series-b", label: "Series B" },
+    { value: "series-c", label: "Series C+" },
+    { value: "bootstrapped", label: "Bootstrapped" },
 ];
 
 const INDUSTRIES = [
-    "SaaS",
-    "FinTech",
-    "EdTech",
-    "HealthTech",
-    "AI",
-    "E-Commerce",
-    "Cyber Security",
-    "Blockchain",
-    "Marketplace",
-    "Logistics",
+    "SaaS", "FinTech", "EdTech", "HealthTech", "AI",
+    "E-Commerce", "Cyber Security", "Blockchain", "Marketplace", "Logistics",
 ];
 
 export default function AddStartupForm() {
@@ -64,15 +37,22 @@ export default function AddStartupForm() {
     const [myStart, setStart] = useState(null);
 
     const {
+        control,
         register,
         handleSubmit,
         setValue,
         reset,
         formState: { errors },
-    } = useForm();
-
-
-
+    } = useForm({
+        defaultValues: {
+            startup_name: "",
+            founder_email: "",
+            industry: "",
+            funding_stage: "",
+            image: "",
+            description: "",
+        },
+    });
 
     useEffect(() => {
         if (!session?.user?.email) return;
@@ -80,14 +60,28 @@ export default function AddStartupForm() {
         const setStartData = async () => {
             const start = await myStartup(session.user.email);
             setStart(start);
+
+            if (start) {
+                reset({
+                    startup_name: start.startup_name || "",
+                    founder_email: session.user.email,
+                    industry: start.industry || "",
+                    funding_stage: start.funding_stage || "",
+                    image: start.logo || "",
+                    description: start.description || "",
+                });
+                if (start.logo) {
+                    setPreview(start.logo);
+                }
+            } else {
+                setValue("founder_email", session.user.email);
+            }
         };
 
         setStartData();
-
-    }, [session]);
+    }, [session, reset, setValue]);
 
     console.log(myStart);
-
 
     const onSubmit = async (data) => {
         try {
@@ -128,9 +122,7 @@ export default function AddStartupForm() {
                 } else {
                     toast.error("Failed to submit startup");
                 }
-
             } else {
-
                 const updatedRes = await updateStartups(
                     startupData,
                     myStart._id
@@ -146,7 +138,6 @@ export default function AddStartupForm() {
                     toast.error("Already Updated");
                 }
             }
-
         } catch (error) {
             console.log(error);
             toast.error("Something went wrong!");
@@ -154,6 +145,7 @@ export default function AddStartupForm() {
             setLoading(false);
         }
     };
+
     return (
         <section className="max-w-5xl mx-auto px-4 py-6">
             <DashboardTitle
@@ -163,21 +155,14 @@ export default function AddStartupForm() {
 
             <div className="relative mt-8 overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.03] backdrop-blur-2xl shadow-[0_0_60px_rgba(255,255,255,0.05)]">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-cyan-500/10 pointer-events-none" />
-
                 <div className="absolute -top-32 -right-32 h-72 w-72 rounded-full bg-blue-500/10 blur-3xl" />
-
                 <div className="absolute -bottom-32 -left-32 h-72 w-72 rounded-full bg-cyan-500/10 blur-3xl" />
 
                 <div className="relative p-8 md:p-10">
-
                     <div className="mb-8">
-                        <h2 className="text-3xl font-bold">
-                            Submit Your Startup
-                        </h2>
-
+                        <h2 className="text-3xl font-bold">Submit Your Startup</h2>
                         <p className="mt-2 text-default-500">
-                            Showcase your startup to investors, founders and
-                            future team members.
+                            Showcase your startup to investors, founders and future team members.
                         </p>
                     </div>
 
@@ -185,66 +170,69 @@ export default function AddStartupForm() {
                         onSubmit={handleSubmit(onSubmit)}
                         className="grid grid-cols-1 md:grid-cols-2 gap-6"
                     >
-                        <input
-                            defaultValue={myStart?.startup_name}
-                            type="text"
-                            placeholder="Enter your startup name"
-                            {...register("startup_name", {
-                                required: "Startup name is required",
-                            })}
-                            className="w-full h-14 rounded-xl border border-white/10 bg-white/5 px-4 text-white outline-none focus:border-blue-500 md:col-span-1"
-                        />
-
-                        {errors.startup_name && (
-                            <p className="mt-1 text-sm text-red-500">
-                                {errors.startup_name.message}
-                            </p>
-                        )}
-
-                        <input
-                            type="email"
-                            value={session?.user?.email || ""}
-                            readOnly
-                            {...register("founder_email", {
-
-                            })}
-                            className="w-full h-14 rounded-xl border border-white/10 bg-white/5 px-4 text-white outline-none cursor-not-allowed md:col-span-1"
-                        />
-
-                        {errors.founder_email && (
-                            <p className="mt-1 text-sm text-red-500">
-                                {errors.founder_email.message}
-                            </p>
-                        )}
-
-                        {/* Industry */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-default-600">
-                                Industry
-                            </label>
-
-                            <select
-                                defaultValue={myStart?.industry}
-                                {...register("industry", {
-                                    required: "Industry is required",
+                        {/* Startup Name */}
+                        <div className="space-y-1 md:col-span-1">
+                            <input
+                                type="text"
+                                placeholder="Enter your startup name"
+                                {...register("startup_name", {
+                                    required: "Startup name is required",
                                 })}
-                                className="w-full h-14 rounded-xl border border-white/10 bg-black text-white px-4 outline-none"
-                            >
-                                <option value="" className="bg-black text-white">
-                                    Select Industry
-                                </option>
+                                className="w-full h-14 rounded-xl border border-white/10 bg-white/5 px-4 text-white outline-none focus:border-blue-500"
+                            />
+                            {errors.startup_name && (
+                                <p className="mt-1 text-sm text-red-500">
+                                    {errors.startup_name.message}
+                                </p>
+                            )}
+                        </div>
 
-                                {INDUSTRIES.map((industry) => (
-                                    <option
-                                        key={industry}
-                                        value={industry}
-                                        className="bg-black text-white"
+                        {/* Founder Email */}
+                        <div className="space-y-1 md:col-span-1">
+                            <input
+                                type="email"
+                                value={session?.user?.email || ""}
+                                readOnly
+                                {...register("founder_email")}
+                                className="w-full h-14 rounded-xl border border-white/10 bg-white/5 px-4 text-white outline-none cursor-not-allowed"
+                            />
+                            {errors.founder_email && (
+                                <p className="mt-1 text-sm text-red-500">
+                                    {errors.founder_email.message}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Industry Select */}
+                        <div className="space-y-2">
+                            <Controller
+                                name="industry"
+                                control={control}
+                                rules={{ required: "Industry is required" }}
+                                render={({ field }) => (
+                                    <Select
+                                        className="w-full text-white"
+                                        placeholder="Select Industry"
+                                        value={field.value || null}
+                                        onChange={field.onChange}
                                     >
-                                        {industry}
-                                    </option>
-                                ))}
-                            </select>
-
+                                        <Label className="text-sm font-medium text-default-600">Industry</Label>
+                                        <Select.Trigger className="w-full h-14 flex items-center justify-between rounded-xl border border-white/10 bg-[#0b1220] p-4 text-left">
+                                            <Select.Value />
+                                            <Select.Indicator />
+                                        </Select.Trigger>
+                                        <Select.Popover className="border border-white/10 bg-slate-900 rounded-xl shadow-xl">
+                                            <ListBox className="p-2 text-white">
+                                                {INDUSTRIES.map((industry) => (
+                                                    <ListBox.Item id={industry} key={industry} textValue={industry} className="rounded-lg px-3 py-2 hover:bg-white/10 cursor-pointer">
+                                                        {industry}
+                                                    </ListBox.Item>
+                                                ))}
+                                            </ListBox>
+                                        </Select.Popover>
+                                    </Select>
+                                )}
+                            />
                             {errors.industry && (
                                 <p className="mt-1 text-sm text-red-500">
                                     {errors.industry.message}
@@ -252,34 +240,36 @@ export default function AddStartupForm() {
                             )}
                         </div>
 
-                        {/* Funding Stage */}
+                        {/* Funding Stage Select */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-default-600">
-                                Funding Stage
-                            </label>
-
-                            <select
-                                defaultValue={myStart?.funding_stage}
-                                {...register("funding_stage", {
-                                    required: "Funding stage is required",
-                                })}
-                                className="w-full h-14 rounded-xl border border-white/10 bg-black text-white px-4 outline-none"
-                            >
-                                <option value="" className="bg-black text-white">
-                                    Select Funding Stage
-                                </option>
-
-                                {FUNDING_STAGES.map((stage) => (
-                                    <option
-                                        key={stage.value}
-                                        value={stage.label}
-                                        className="bg-black text-white"
+                            <Controller
+                                name="funding_stage"
+                                control={control}
+                                rules={{ required: "Funding stage is required" }}
+                                render={({ field }) => (
+                                    <Select
+                                        className="w-full text-white"
+                                        placeholder="Select Funding Stage"
+                                        value={field.value || null}
+                                        onChange={field.onChange}
                                     >
-                                        {stage.label}
-                                    </option>
-                                ))}
-                            </select>
-
+                                        <Label className="text-sm font-medium text-default-600">Funding Stage</Label>
+                                        <Select.Trigger className="w-full h-14 flex items-center justify-between rounded-xl border border-white/10 bg-[#0b1220] p-4 text-left">
+                                            <Select.Value />
+                                            <Select.Indicator />
+                                        </Select.Trigger>
+                                        <Select.Popover className="border border-white/10 bg-slate-900 rounded-xl shadow-xl">
+                                            <ListBox className="p-2 text-white">
+                                                {FUNDING_STAGES.map((stage) => (
+                                                    <ListBox.Item id={stage.label} key={stage.value} textValue={stage.label} className="rounded-lg px-3 py-2 hover:bg-white/10 cursor-pointer">
+                                                        {stage.label}
+                                                    </ListBox.Item>
+                                                ))}
+                                            </ListBox>
+                                        </Select.Popover>
+                                    </Select>
+                                )}
+                            />
                             {errors.funding_stage && (
                                 <p className="mt-1 text-sm text-red-500">
                                     {errors.funding_stage.message}
@@ -289,8 +279,7 @@ export default function AddStartupForm() {
 
                         {/* Startup Logo */}
                         <div className="w-full md:col-span-2">
-                            <Label>Startup Logo</Label>
-
+                            <Label className="text-sm font-medium text-default-600">Startup Logo</Label>
                             <input
                                 ref={fileInputRef}
                                 type="file"
@@ -305,14 +294,12 @@ export default function AddStartupForm() {
                                     )
                                 }
                             />
-
                             <input
                                 type="hidden"
                                 {...register("image", {
                                     required: "Startup logo is required",
                                 })}
                             />
-
                             <div className="mt-4 flex items-center gap-4">
                                 {preview ? (
                                     <Image
@@ -327,7 +314,6 @@ export default function AddStartupForm() {
                                         <FaImage className="text-2xl text-slate-500" />
                                     </div>
                                 )}
-
                                 <Button
                                     type="button"
                                     onPress={() => fileInputRef.current?.click()}
@@ -337,7 +323,6 @@ export default function AddStartupForm() {
                                     {uploading ? "Uploading..." : "Upload Logo"}
                                 </Button>
                             </div>
-
                             {errors.image && (
                                 <p className="mt-2 text-sm text-red-500">
                                     {errors.image.message}
@@ -350,9 +335,7 @@ export default function AddStartupForm() {
                             <label className="text-sm font-medium text-default-600">
                                 Description
                             </label>
-
                             <textarea
-                                defaultValue={myStart?.description}
                                 {...register("description", {
                                     required: "Description is required",
                                 })}
@@ -360,7 +343,6 @@ export default function AddStartupForm() {
                                 placeholder="Describe your startup, mission, vision, market opportunity and what problem you're solving..."
                                 className="w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-white outline-none resize-none"
                             />
-
                             {errors.description && (
                                 <p className="mt-1 text-sm text-red-500">
                                     {errors.description.message}
@@ -368,7 +350,7 @@ export default function AddStartupForm() {
                             )}
                         </div>
 
-                        {/* Submit */}
+                        {/* Submit Button */}
                         <div className="md:col-span-2 pt-2">
                             <Button
                                 type="submit"

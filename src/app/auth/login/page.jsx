@@ -79,16 +79,13 @@ export default function LoginPage() {
 
     const handleGoogleLogin = async () => {
         try {
-            setGoogleLoading(true);
-
             await authClient.signIn.social({
                 provider: "google",
                 callbackURL: "/",
             });
-        } catch (error) {
+        } catch (err) {
+            console.error(err);
             toast.error("Google login failed");
-        } finally {
-            setGoogleLoading(false);
         }
     };
 

@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { addOpportunities } from "@/lib/api/opportunities/actions";
 import { useRouter } from "next/navigation";
 
-// Fully updated HeroUI v3 Imports including DatePicker/Calendar composition pieces
+
 import {
     Button,
     Card,
@@ -140,7 +140,7 @@ const AddOpportunityForm = () => {
                         onSubmit={handleSubmit(onSubmit)}
                         className="grid grid-cols-1 gap-6 md:grid-cols-2"
                     >
-                        {/* ================= Role Title ================= */}
+                        {/* Role Title */}
                         <div className="space-y-2">
                             <Controller
                                 name="role_title"
@@ -175,7 +175,7 @@ const AddOpportunityForm = () => {
                             )}
                         </div>
 
-                        {/* ================= Work Type ================= */}
+                        {/* Work Type */}
                         <div className="space-y-2">
                             <Controller
                                 name="work_type"
@@ -210,7 +210,7 @@ const AddOpportunityForm = () => {
                             )}
                         </div>
 
-                        {/* ================= Commitment Level ================= */}
+                        {/* Commitment Level */}
                         <div className="space-y-2">
                             <Controller
                                 name="commitment_level"
@@ -245,7 +245,7 @@ const AddOpportunityForm = () => {
                             )}
                         </div>
 
-                        {/* ================= Deadline (Corrected HeroUI v3 Structure) ================= */}
+                        {/* Deadline  */}
                         <div className="space-y-2">
                             <Controller
                                 name="deadline"
@@ -293,7 +293,7 @@ const AddOpportunityForm = () => {
                             )}
                         </div>
 
-                        {/* ================= Required Skills (Multiple) ================= */}
+                        {/*Required Skills */}
                         <div className="md:col-span-2 space-y-2">
                             <Controller
                                 name="required_skills"
@@ -346,7 +346,7 @@ const AddOpportunityForm = () => {
                             )}
                         </div>
 
-                        {/* ================= Submit Button ================= */}
+                        {/* Submit*/}
                         <div className="pt-2 md:col-span-2">
                             <Button
                                 type="submit"

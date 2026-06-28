@@ -91,7 +91,7 @@ const MngOpportunity = () => {
 
             const result = await deleteOpportunity(selectedId);
 
-            if (result.deletedCount) {
+            if (result?.deletedCount) {
                 toast.success("Opportunity Deleted");
                 await loadData();
             } else {

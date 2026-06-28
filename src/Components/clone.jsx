@@ -1263,3 +1263,44 @@
 // };
 
 // export default AddOpportunityForm;
+
+
+
+
+
+
+
+{/* Backend*/ }
+{/*get by id*/ }
+// app.get("/api/opportunities/:startupId", async (req, res) => {
+//     const { startupId } = req.params;
+
+//     const result = await opportunitiesCollection
+//         .find({ startup_id: startupId })
+//         .toArray();
+
+//     res.send(result);
+// });
+
+
+
+// app.get("/api/opportunities/:startupId", async (req, res) => {
+//             const { startupId } = req.params;
+
+//             const result = await opportunitiesCollection
+//                 .find({ startup_id: startupId })
+//                 .toArray();
+
+//             res.send(result);
+//         });
+
+//         // // Get all opportunities of a startup
+//         app.get("/api/opportunities/startup/:startupId", async (req, res) => {
+//             const { startupId } = req.params;
+
+//             const result = await opportunitiesCollection
+//                 .find({ startup_id: startupId })
+//                 .toArray();
+
+//             res.send(result);
+//         });
