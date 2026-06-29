@@ -1,28 +1,29 @@
-"use client";
+"use server"
 
-import { useSession } from "@/lib/auth-client";
+import UpgradePremiumBtn from "@/Components/UpgradePremiumBtn";
+import { getUser } from "@/lib/api/session";
 import { Hand } from "@gravity-ui/icons";
 import {
     BriefcaseBusiness,
     FileText,
     Users,
     CheckCircle,
-    Waves,
+
 } from "lucide-react";
 
-const FounderPage = () => {
-    const { data: session, isPending } = useSession();
+const FounderPage = async () => {
 
-    if (isPending) {
-        return (
-            <div className="flex items-center justify-center min-h-[60vh] text-white">
-                Loading...
-            </div>
-        );
-    }
+    const user = await getUser()
 
-    const user = session?.user;
+
+
+
+
+
     const isPremium = user?.isPremium || false;
+    // const isPremium = true;
+
+
 
     const stats = [
         {
@@ -86,7 +87,9 @@ const FounderPage = () => {
                 ))}
             </div>
 
-            {!isPremium && (
+            {!isPremium ? (
+
+                // Free User
                 <div className="relative overflow-hidden rounded-3xl border border-yellow-500/20 bg-gradient-to-br from-zinc-900 via-zinc-950 to-yellow-950 p-8">
                     <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-yellow-500/20 blur-3xl"></div>
 
@@ -105,10 +108,8 @@ const FounderPage = () => {
                                 advanced analytics, and more powerful tools to grow
                                 your startup faster.
                             </p>
+                            <UpgradePremiumBtn />
 
-                            <button className="mt-6 rounded-2xl bg-yellow-500 px-6 py-3 font-semibold text-black transition hover:scale-105">
-                                Upgrade Now
-                            </button>
                         </div>
 
                         <div className="rounded-3xl border border-yellow-500/20 bg-zinc-900/80 px-8 py-10 text-center">
@@ -127,6 +128,52 @@ const FounderPage = () => {
                         </div>
                     </div>
                 </div>
+            ) : (
+
+                // Premium User
+                <div className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-zinc-900 via-zinc-950 to-emerald-950 p-8">
+                    <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-emerald-500/20 blur-3xl"></div>
+
+                    <div className="relative flex flex-col lg:flex-row items-center justify-between gap-8">
+                        <div>
+                            <span className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-400">
+                                Premium Active
+                            </span>
+
+                            <h2 className="mt-5 text-3xl font-bold">
+                                Your Premium Membership is Active 🎉
+                            </h2>
+
+                            <p className="mt-3 max-w-2xl text-zinc-400">
+                                You now have access to featured opportunities, unlimited
+                                applications, advanced analytics, and priority support.
+                                Thank you for supporting StartupForge.
+                            </p>
+
+                            <button
+                                disabled
+                                className="mt-6 rounded-2xl bg-emerald-500 px-6 py-3 font-semibold text-black cursor-default"
+                            >
+                                Premium Activated
+                            </button>
+                        </div>
+
+                        <div className="rounded-3xl border border-emerald-500/20 bg-zinc-900/80 px-8 py-10 text-center">
+                            <h3 className="text-xl font-bold text-emerald-400">
+                                Membership
+                            </h3>
+
+                            <p className="mt-3 text-zinc-400">
+                                Current Status
+                            </p>
+
+                            <h1 className="mt-4 text-5xl font-bold text-emerald-400">
+                                ACTIVE
+                            </h1>
+                        </div>
+                    </div>
+                </div>
+
             )}
 
             {/* Recent Applications */}

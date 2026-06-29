@@ -26,7 +26,11 @@ import { signOut, useSession } from "@/lib/auth-client";
 export default function DashboardSidebar({ role, isPremium }) {
     const [open, setOpen] = useState(false);
 
-    const { data: session } = useSession();
+    const { data: session, isPending } = useSession();
+
+    if (isPending) {
+        return null;
+    }
 
     const founderLinks = [
         {

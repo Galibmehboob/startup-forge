@@ -6,19 +6,20 @@ import { useSession } from "@/lib/auth-client";
 const DashBoardLayout = ({ children }) => {
     const { data: session, isPending } = useSession();
 
+    // Session load হওয়া পর্যন্ত sidebar render করো না
     if (isPending) {
         return (
-            <div className="flex min-h-screen items-center justify-center">
-                Loading...
-            </div>
+            <main className="min-h-screen">
+                {children}
+            </main>
         );
     }
 
     return (
         <div className="mx-auto flex max-w-screen-2xl">
 
-            {/* Sidebar */}
-            <aside className="hidden lg:block w-72 shrink-0">
+            {/* Desktop Sidebar */}
+            <aside className="hidden w-72 shrink-0 lg:block">
                 <div className="sticky top-16 h-[calc(100vh-64px)]">
                     <DashboardSidebar
                         role={session?.user?.role}
