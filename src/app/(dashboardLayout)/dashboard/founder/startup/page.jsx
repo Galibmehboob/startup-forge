@@ -100,7 +100,7 @@ export default function AddStartupForm() {
 
             if (!myStart) {
                 const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/startups`,
+                    `${process.env.NEXT_PUBLIC_API_URL}/api/startups`,
                     {
                         method: "POST",
                         headers: {

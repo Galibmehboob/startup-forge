@@ -81,17 +81,17 @@ export default function DashboardSidebar({ role, isPremium }) {
         },
         {
             name: "Manage Users",
-            href: "/dashboard/manage-users",
+            href: "/dashboard/admin/manage-users",
             icon: Users,
         },
         {
             name: "Manage Startups",
-            href: "/dashboard/manage-startups",
+            href: "/dashboard/admin/manage-startups",
             icon: FolderKanban,
         },
         {
             name: "Transactions",
-            href: "/dashboard/transactions",
+            href: "/dashboard/admin/transactions",
             icon: CreditCard,
         },
     ];
