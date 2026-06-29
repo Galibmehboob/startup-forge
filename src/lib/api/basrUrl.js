@@ -1,2 +1,2 @@
 
-export const baseUrl = "http://localhost:3005"
+export const baseUrl = 'https://startup-forge-server-rho.vercel.app'

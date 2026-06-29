@@ -26,7 +26,7 @@ export const updateApplicationStatus = async (id, status) => {
 
 
     const res = await fetch(
-        `http://localhost:3005/api/applications/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/applications/${id}`,
         {
 
             method: "PATCH",
