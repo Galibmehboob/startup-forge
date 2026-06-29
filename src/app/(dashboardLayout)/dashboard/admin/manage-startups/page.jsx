@@ -22,7 +22,7 @@ const ManageStartups = () => {
     useEffect(() => {
 
 
-        fetch("http://localhost:3005/api/admin/startups")
+        fetch("https://startup-forge-server-rho.vercel.app/api/admin/startups")
             .then(res => res.json())
             .then(data => {
 
@@ -42,7 +42,7 @@ const ManageStartups = () => {
 
         const res = await fetch(
 
-            `http://localhost:3005/api/startups/status/${id}`,
+            `https://startup-forge-server-rho.vercel.app/api/startups/status/${id}`,
 
             {
 

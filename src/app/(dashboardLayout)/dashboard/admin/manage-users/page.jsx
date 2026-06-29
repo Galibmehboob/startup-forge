@@ -16,7 +16,7 @@ const ManageUsers = () => {
     const [search, setSearch] = useState("");
 
     useEffect(() => {
-        fetch("http://localhost:3005/api/admin/users")
+        fetch("https://startup-forge-server-rho.vercel.app/api/admin/users")
             .then(res => res.json())
             .then(data => {
                 setUsers(data || []);

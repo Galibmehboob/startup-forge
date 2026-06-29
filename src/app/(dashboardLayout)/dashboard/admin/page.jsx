@@ -24,25 +24,25 @@ const AdminPage = () => {
     useEffect(() => {
 
 
-        fetch("http://localhost:3005/api/admin/users")
+        fetch("https://startup-forge-server-rho.vercel.app/api/admin/users")
             .then(res => res.json())
             .then(data => setUsers(data));
 
 
 
-        fetch("http://localhost:3005/api/admin/startups")
+        fetch("https://startup-forge-server-rho.vercel.app/api/admin/startups")
             .then(res => res.json())
             .then(data => setStartups(data));
 
 
 
-        fetch("http://localhost:3005/api/payments")
+        fetch("https://startup-forge-server-rho.vercel.app/api/payments")
             .then(res => res.json())
             .then(data => setPayments(data));
 
 
 
-        fetch("http://localhost:3005/api/opportunities")
+        fetch("https://startup-forge-server-rho.vercel.app/api/opportunities")
             .then(res => res.json())
             .then(data => {
 
