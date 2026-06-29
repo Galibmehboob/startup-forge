@@ -6,7 +6,7 @@ import { useSession } from "@/lib/auth-client";
 const DashBoardLayout = ({ children }) => {
     const { data: session, isPending } = useSession();
 
-    // Session load হওয়া পর্যন্ত sidebar render করো না
+
     if (isPending) {
         return (
             <main className="min-h-screen">
