@@ -68,14 +68,9 @@ export default function DashboardSidebar({ role, isPremium }) {
         },
         {
             name: "My Applications",
-            href: "/dashboard/my-applications",
+            href: "/dashboard/collaborator/my-applications",
             icon: FileText,
-        },
-        {
-            name: "Profile",
-            href: "/dashboard/profile",
-            icon: User,
-        },
+        }
     ];
 
     const adminLinks = [

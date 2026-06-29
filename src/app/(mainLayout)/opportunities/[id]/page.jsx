@@ -1,4 +1,6 @@
+
 import { baseUrl } from "@/lib/api/basrUrl";
+
 import {
     Button,
     Card,
@@ -15,8 +17,11 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import ApplyButton from "./ApplyButton";
 
 const fetchOpportunity = async (_id) => {
+
+
     const res = await fetch(`${baseUrl}/api/opportunities/${_id}`, {
         cache: "no-store",
     });
@@ -154,7 +159,7 @@ const CardDetailsPage = async ({ params }) => {
                         </div>
                     </div>
 
-                    {/* Form Controls / Redirections Block */}
+
                     <div className="flex flex-col sm:flex-row gap-4 mt-10 pt-6 border-t border-white/5">
                         <Link href={`/opportunities`} className="w-full sm:w-1/3">
                             <Button
@@ -165,13 +170,9 @@ const CardDetailsPage = async ({ params }) => {
                                 <ArrowLeft size={16} /> Back
                             </Button>
                         </Link>
-
-                        <Button
-                            radius="xl"
-                            className="group flex-1 h-12 w-full bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white font-bold text-sm shadow-xl hover:opacity-95 transition-all duration-200 active:scale-[0.99]"
-                        >
-                            Apply Now
-                        </Button>
+                        <ApplyButton
+                            opportunity={opportunity}
+                        />
                     </div>
 
                 </Card>
