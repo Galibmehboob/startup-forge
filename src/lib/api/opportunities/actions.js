@@ -1,8 +1,15 @@
 "use server";
 
+
+import { authClient } from "@/lib/auth-client";
 import { serverMutation } from "../server";
 
+
 export const addOpportunities = async (data) => {
+    const { data: token } = await authClient.token()
+    console.log(token);
+
+
     return await serverMutation("/api/opportunities", "POST", data);
 };
 

@@ -1,178 +1,211 @@
 "use client";
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import DashboardTitle from '@/Components/DashboardTitle';
-
-// HeroUI v3 layout updates parameters layout core base setup
+import { useEffect, useState } from "react";
+import { useSession } from "@/lib/auth-client";
+import { Card, Button, Modal } from "@heroui/react";
+import { getFounderApplications, updateApplicationStatus } from "@/lib/api/applications/action";
 import {
-    Select,
-    ListBox
-} from '@heroui/react';
-
-// Iconography element bundles
-import {
-    Search,
+    Mail,
     Briefcase,
-    CheckCircle2,
-    Clock,
-    XCircle,
-    ArrowUpRight,
-    SlidersHorizontal
-} from 'lucide-react';
+    Activity,
+    ExternalLink,
+    UserCheck,
+    FileText,
+    Check,
+    X,
+    Sparkles
+} from "lucide-react";
 
-export default function ApplicationPage() {
-    const [searchQuery, setSearchQuery] = useState("");
-    const [statusFilter, setStatusFilter] = useState(new Set(["all"]));
+export default function FounderApplications() {
+    const { data: session } = useSession();
+    const [applications, setApplications] = useState([]);
+    const [selected, setSelected] = useState(null);
 
-    // Framer motion animation configurations
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: { staggerChildren: 0.08 }
+    useEffect(() => {
+        if (session?.user?.email) {
+            getFounderApplications(session.user.email)
+                .then(data => setApplications(data || []))
+                .catch(err => console.error("Error fetching apps:", err));
+        }
+    }, [session]);
+
+    const changeStatus = async (status) => {
+        if (!selected) return;
+        try {
+            await updateApplicationStatus(selected._id, status);
+            setApplications(prev =>
+                prev.map(item =>
+                    item._id === selected._id ? { ...item, status } : item
+                )
+            );
+            setSelected(null);
+        } catch (err) {
+            console.error("Failed to update status:", err);
         }
     };
 
-    const itemVariants = {
-        hidden: { opacity: 0, y: 15 },
-        show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+    const getStatusStyles = (status) => {
+        switch (status?.toLowerCase()) {
+            case "accepted":
+                return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+            case "rejected":
+                return "bg-red-500/10 text-red-400 border-red-500/20";
+            default:
+                return "bg-amber-500/10 text-amber-400 border-amber-500/20";
+        }
     };
 
     return (
-        <div className="space-y-8 p-2 sm:p-4 text-white font-sans selection:bg-blue-500/30">
+        <div className="w-full max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 text-white font-sans selection:bg-blue-500/30 space-y-6">
 
-            {/* Header Dashboard Area */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-white/5 pb-6">
-                <DashboardTitle
-                    title="Applications"
-                    description="Read it loud and make it possible. Manage your ecosystem applications pipeline."
-                />
+            {/* Heading section */}
+            <div className="border-b border-white/5 pb-5">
+                <div className="flex items-center gap-2 text-blue-400 mb-1">
+                    <Sparkles size={16} className="animate-pulse" />
+                    <span className="text-xs font-semibold uppercase tracking-wider font-mono">Founder Panel</span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+                    Incoming Applications
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-400 mt-1">
+                    Review candidate submissions, portfolios, and manage talent pipeline status.
+                </p>
             </div>
 
-            {/* Metrics Analytics Track Cards */}
-            <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="show"
-                className="grid gap-4 grid-cols-2 lg:grid-cols-4"
-            >
-                {[
-                    { label: "Total Applied", value: "12", icon: Briefcase, color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20" },
-                    { label: "Pending Review", value: "5", icon: Clock, color: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/20" },
-                    { label: "Selected Shortlist", value: "3", icon: CheckCircle2, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
-                    { label: "Rejected Pipeline", value: "4", icon: XCircle, color: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/20" }
-                ].map((stat, index) => (
-                    <motion.div
-                        key={index}
-                        variants={itemVariants}
-                        whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                        className="flex items-center gap-4 rounded-2xl border border-white/5 bg-slate-900/40 backdrop-blur-md p-4 shadow-lg shadow-black/20"
-                    >
-                        <div className={`p-3 rounded-xl ${stat.bg} ${stat.color} border ${stat.border} shrink-0`}>
-                            <stat.icon size={20} />
-                        </div>
-                        <div>
-                            <p className="text-[10px] sm:text-xs text-slate-500 font-bold tracking-widest uppercase">{stat.label}</p>
-                            <h3 className="text-xl sm:text-2xl font-extrabold text-slate-100 mt-0.5">{stat.value}</h3>
-                        </div>
-                    </motion.div>
-                ))}
-            </motion.div>
-
-            {/* Controls Filter Management Row */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-slate-900/20 border border-white/5 p-4 rounded-2xl backdrop-blur-xl">
-
-                {/* Fixed Search Input Wrapper Block (Aponar console DOM properties error fix wrapper) */}
-                <div className="flex-1 max-w-md relative flex items-center">
-                    <Search size={16} className="absolute left-3.5 text-slate-500 pointer-events-none z-10" />
-                    <input
-                        type="text"
-                        placeholder="Search by role or team name..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-slate-950/60 border border-white/10 focus:border-blue-500/50 outline-none text-sm text-white placeholder:text-slate-500 h-11 rounded-xl pl-10 pr-4 transition-all duration-200"
-                    />
+            {/* Applications Grid */}
+            {applications.length === 0 ? (
+                <div className="border border-dashed border-white/10 rounded-2xl p-12 text-center text-slate-500 text-sm bg-slate-900/10">
+                    No applications received for your opportunities yet.
                 </div>
+            ) : (
+                <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    {applications.map(app => (
+                        <Card
+                            key={app._id}
+                            className="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-5 relative overflow-hidden group hover:border-white/10 transition-all duration-200"
+                        >
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-xs text-slate-400 font-mono bg-slate-950/40 px-2.5 py-1.5 rounded-xl border border-white/5 w-fit max-w-full">
+                                        <Mail size={13} className="text-slate-500 shrink-0" />
+                                        <span className="truncate">{app.applicant_email}</span>
+                                    </div>
+                                    <h2 className="text-lg font-bold text-slate-100 tracking-tight flex items-center gap-2 pt-1">
+                                        <Briefcase size={16} className="text-blue-400 shrink-0" />
+                                        <span className="truncate">{app.role_title}</span>
+                                    </h2>
+                                </div>
 
-                {/* HeroUI Selector Pipeline Layer */}
-                <div className="w-full sm:w-60">
-                    <Select
-                        placeholder="Select Pipeline Status"
-                        variant="flat"
-                        selectedKeys={statusFilter}
-                        onSelectionChange={setStatusFilter}
-                        startContent={<SlidersHorizontal size={14} className="text-slate-500 mr-1" />}
-                        classNames={{
-                            trigger: "bg-slate-950/60 border border-white/10 hover:bg-slate-900 h-11 rounded-xl transition-all duration-200",
-                            value: "text-sm text-slate-200 font-medium"
-                        }}
-                    >
-                        <Select.Popover className="bg-slate-900 border border-white/10 text-white rounded-xl shadow-xl">
-                            <ListBox className="p-1">
-                                <ListBox.Item id="all" textValue="All Status" className="text-sm rounded-lg text-slate-200 hover:bg-slate-800">All Applications</ListBox.Item>
-                                <ListBox.Item id="pending" textValue="Pending" className="text-sm rounded-lg text-slate-200 hover:bg-slate-800">Pending</ListBox.Item>
-                                <ListBox.Item id="selected" textValue="Selected" className="text-sm rounded-lg text-slate-200 hover:bg-slate-800">Selected</ListBox.Item>
-                                <ListBox.Item id="rejected" textValue="Rejected" className="text-sm rounded-lg text-slate-200 hover:bg-slate-800">Rejected</ListBox.Item>
-                            </ListBox>
-                        </Select.Popover>
-                    </Select>
+                                <div className="flex items-center justify-between border-t border-white/5 pt-4 mt-2">
+                                    <div className={`flex items-center gap-1.5 px-2.5 py-0.5 border text-[10px] font-mono font-bold uppercase tracking-wider rounded-md ${getStatusStyles(app.status)}`}>
+                                        <Activity size={10} />
+                                        <span>{app.status || "pending"}</span>
+                                    </div>
+
+                                    <Button
+                                        size="sm"
+                                        radius="lg"
+                                        onPress={() => setSelected(app)}
+                                        className="bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 text-xs font-semibold"
+                                    >
+                                        View Details
+                                    </Button>
+                                </div>
+                            </div>
+                        </Card>
+                    ))}
                 </div>
-            </div>
+            )}
 
-            {/* Applications List Grid Container Wrapper */}
-            <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="show"
-                className="grid gap-5 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2"
-            >
-                {/* Simulated Mock Application cards */}
-                <motion.div
-                    variants={itemVariants}
-                    whileHover={{ scale: 1.01, border: "1px solid rgba(255,255,255,0.12)" }}
-                    className="border border-white/5 bg-slate-900/30 rounded-2xl p-6 relative group overflow-hidden transition-all duration-200 shadow-lg"
+            {/* Application Detail Modal - Standardizing dynamic dot notation architecture */}
+            {selected && (
+                <Modal
+                    isOpen={!!selected}
+                    onOpenChange={() => setSelected(null)}
                 >
-                    <div className="absolute top-0 left-0 w-1 h-full bg-orange-500" />
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <span className="text-[10px] font-mono tracking-wider text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded-md uppercase font-bold">
-                                Pending Review
-                            </span>
-                            <h3 className="text-lg font-bold text-slate-200 mt-3 group-hover:text-blue-400 transition-colors duration-150">
-                                Software Engineer Intern
-                            </h3>
-                            <p className="text-sm text-slate-400 mt-1">StartupForge Ecosystem Labs &bull; Remote</p>
-                        </div>
-                        <button className="text-slate-500 hover:text-white p-1.5 bg-white/5 rounded-xl transition-colors">
-                            <ArrowUpRight size={16} />
-                        </button>
-                    </div>
-                </motion.div>
+                    <Modal.Backdrop
+                        className="bg-gradient-to-t from-black/80 via-black/40 to-transparent dark:from-zinc-950/80 dark:via-zinc-900/40 backdrop-blur-sm z-[9999]"
+                        variant="blur"
+                    >
+                        <Modal.Container>
+                            <Modal.Dialog className="bg-slate-900 border border-white/10 rounded-3xl text-white max-w-xl w-full mx-auto shadow-2xl overflow-hidden">
 
-                <motion.div
-                    variants={itemVariants}
-                    whileHover={{ scale: 1.01, border: "1px solid rgba(255,255,255,0.12)" }}
-                    className="border border-white/5 bg-slate-900/30 rounded-2xl p-6 relative group overflow-hidden transition-all duration-200 shadow-lg"
-                >
-                    <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500" />
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <span className="text-[10px] font-mono tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md uppercase font-bold">
-                                Selected
-                            </span>
-                            <h3 className="text-lg font-bold text-slate-200 mt-3 group-hover:text-blue-400 transition-colors duration-150">
-                                Senior Frontend Architect
-                            </h3>
-                            <p className="text-sm text-slate-400 mt-1">MetaCraft Ventures &bull; Hybrid (Dhaka)</p>
-                        </div>
-                        <button className="text-slate-500 hover:text-white p-1.5 bg-white/5 rounded-xl transition-colors">
-                            <ArrowUpRight size={16} />
-                        </button>
-                    </div>
-                </motion.div>
+                                <Modal.Header className="border-b border-white/5 px-6 py-4 flex items-center gap-2 text-slate-100 font-bold text-lg">
+                                    <UserCheck size={18} className="text-blue-400" />
+                                    Candidate Evaluation
+                                </Modal.Header>
 
-            </motion.div>
+                                <Modal.Body className="p-6 space-y-5">
+                                    <div className="space-y-1">
+                                        <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 font-bold block">Applicant Identity</span>
+                                        <p className="text-sm text-slate-200 font-medium bg-slate-950/40 px-3 py-2 rounded-xl border border-white/5 truncate flex items-center gap-2">
+                                            <Mail size={14} className="text-slate-400" /> {selected.applicant_email}
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 font-bold block">Target Role</span>
+                                        <p className="text-sm text-slate-200 font-medium bg-slate-950/40 px-3 py-2 rounded-xl border border-white/5 flex items-center gap-2">
+                                            <Briefcase size={14} className="text-slate-400" /> {selected.role_title}
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 font-bold block">Portfolio Resource</span>
+                                        {selected.portfolio_link ? (
+                                            <a
+                                                href={selected.portfolio_link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-sm text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/5 px-3 py-2 rounded-xl border border-blue-500/10 flex items-center justify-between group font-medium"
+                                            >
+                                                <span className="truncate">{selected.portfolio_link}</span>
+                                                <ExternalLink size={14} className="shrink-0 ml-1 opacity-60 group-hover:opacity-100 transition-opacity" />
+                                            </a>
+                                        ) : (
+                                            <p className="text-sm text-slate-500 italic bg-slate-950/20 px-3 py-2 rounded-xl border border-white/5">Not Provided</p>
+                                        )}
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 font-bold block">Cover Motivation / Pitch</span>
+                                        <div className="text-sm text-slate-300 bg-slate-950/40 p-4 rounded-xl border border-white/5 leading-relaxed font-normal flex gap-2 max-h-[160px] overflow-y-auto">
+                                            <FileText size={16} className="text-slate-500 shrink-0 mt-0.5" />
+                                            <p className="whitespace-pre-wrap">{selected.motivation || "No statement attachment recorded."}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 pt-2">
+                                        <span className="text-xs text-slate-400 font-medium">Current Matrix Status:</span>
+                                        <span className={`px-2 py-0.5 border text-[10px] font-mono font-extrabold uppercase rounded ${getStatusStyles(selected.status)}`}>
+                                            {selected.status || "pending"}
+                                        </span>
+                                    </div>
+                                </Modal.Body>
+
+                                <Modal.Footer className="border-t border-white/5 px-6 py-4 gap-3 flex">
+                                    <Button
+                                        onPress={() => changeStatus("rejected")}
+                                        className="bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold rounded-xl flex-1 border border-red-500/10"
+                                        startContent={<X size={15} />}
+                                    >
+                                        Reject
+                                    </Button>
+
+                                    <Button
+                                        onPress={() => changeStatus("accepted")}
+                                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl flex-1 shadow-lg shadow-emerald-600/10"
+                                        startContent={<Check size={15} />}
+                                    >
+                                        Accept
+                                    </Button>
+                                </Modal.Footer>
+
+                            </Modal.Dialog>
+                        </Modal.Container>
+                    </Modal.Backdrop>
+                </Modal>
+            )}
         </div>
     );
 }

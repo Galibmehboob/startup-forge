@@ -30,6 +30,11 @@ export default async function PremiumSuccess({ searchParams }) {
         expand: ["line_items", "payment_intent"],
     });
 
+
+
+    console.log(session);
+
+
     const res = await fetch(`${baseUrl}/api/user/upgrade-premium/${session.customer_email}`,
         {
             method: "PATCH",
@@ -42,8 +47,42 @@ export default async function PremiumSuccess({ searchParams }) {
     const customerEmail = session.customer_email || "your email registered account";
     const amountTotal = session.amount_total ? (session.amount_total / 100).toFixed(2) : "0.00";
     const paymentStatus = session.payment_status || "pending";
-    const transactionId = typeof session.payment_intent === 'object' ? session.payment_intent?.id : session.payment_intent;
+    const transactionId =
+        session.subscription ||
+        session.payment_intent ||
+        session.id;
 
+    // Save payment data
+
+    const paymentRes = await fetch(
+        `${baseUrl}/api/payments`,
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                user_email: customerEmail,
+
+                amount: amountTotal,
+
+                transaction_id: transactionId,
+
+                payment_status: paymentStatus
+
+            })
+
+        }
+    );
+
+
+    const paymentData = await paymentRes.json();
+
+
+    console.log("Payment saved:", paymentData);
 
 
 

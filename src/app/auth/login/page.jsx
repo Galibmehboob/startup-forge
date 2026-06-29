@@ -67,6 +67,35 @@ export default function LoginPage() {
                 return;
             }
 
+            const session = await authClient.getSession();
+
+
+            if (session?.data?.user) {
+
+                await fetch(
+                    "http://localhost:3005/api/jwt",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        credentials: "include",
+
+                        body: JSON.stringify({
+
+                            email: session.data.user.email,
+
+                            role: session.data.user.role
+
+                        })
+                    }
+                );
+
+            }
+
+
             toast.success("Login successful!");
             router.push("/");
         } catch (error) {

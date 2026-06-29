@@ -105,7 +105,7 @@ export default function SignupPage() {
 
     // Submit
     const onSubmit = async (data) => {
-        console.log("Form Data:", data);
+        // console.log("Form Data:", data);
         setLoading(true);
 
         const { data: signUpData, error } = await authClient.signUp.email({
@@ -116,8 +116,8 @@ export default function SignupPage() {
             role: data.role,
         });
 
-        console.log("Signup Data:", signUpData);
-        console.log("Signup Error:", error);
+        // console.log("Signup Data:", signUpData);
+        // console.log("Signup Error:", error);
 
         if (error) {
             toast.error(error.message || "Signup failed");
@@ -136,7 +136,7 @@ export default function SignupPage() {
                 callbackURL: "/",
             });
         } catch (err) {
-            console.error(err);
+            // console.error(err);
             toast.error("Google login failed");
         }
     };
